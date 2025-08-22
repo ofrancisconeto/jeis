@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}Gerenciar Base de Conhecimento{% endblock %}
+{% block content %}
+<div class="card">
+    <h3>Adicionar Novo Conhecimento</h3>
+    <form method="POST" action="{% url 'adicionar_conhecimento' %}">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="pergunta">Pergunta:</label>
+            <input type="text" name="pergunta" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="resposta">Resposta:</label>
+            <textarea name="resposta" class="form-control" rows="3" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primario">Adicionar</button>
+    </form>
+</div>
+
+<div class="card" style="margin-top: 20px;">
+    <h3>Conhecimentos Atuais</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Pergunta</th>
+                <th>Resposta</th>
+                <th style="width: 150px;">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in base_conhecimento %}
+            <tr>
+                <td>{{ item.pergunta }}</td>
+                <td>{{ item.resposta|truncatewords:15 }}</td>
+                <td>
+                    <a href="{% url 'editar_conhecimento' item.id %}" class="btn btn-secundario" style="padding: 5px 10px;">Editar</a>
+                    <a href="{% url 'deletar_conhecimento' item.id %}" class="btn btn-erro" style="padding: 5px 10px;">Deletar</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3">Nenhum conhecimento cadastrado ainda.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

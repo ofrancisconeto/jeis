@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Editar Conhecimento{% endblock %}
+{% block content %}
+<div class="card">
+    <h3>Editando Conhecimento</h3>
+    <form method="POST" action="{% url 'editar_conhecimento' item.id %}">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="pergunta">Pergunta:</label>
+            <input type="text" name="pergunta" class="form-control" value="{{ item.pergunta }}" required>
+        </div>
+        <div class="form-group">
+            <label for="resposta">Resposta:</label>
+            <textarea name="resposta" class="form-control" rows="5" required>{{ item.resposta }}</textarea>
+        </div>
+        <button type="submit" class="btn btn-primario">Salvar Alterações</button>
+        <a href="{% url 'gerenciar_ia' %}" class="btn btn-secundario">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

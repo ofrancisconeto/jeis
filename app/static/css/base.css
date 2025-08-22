@@ -1,0 +1,112 @@
+
+:root {
+    --sidebar-bg: #1F2029;
+    --main-bg: #F0F2F5; 
+    --icon-color: #A7A9B4;
+    --active-bg: #6D4BFF; 
+    --active-icon-color: #FFFFFF;
+    --tooltip-bg: #000000;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif; 
+    background-color: var(--main-bg);
+}
+
+.app-container {
+    display: flex;
+}
+
+
+.sidebar {
+    position: fixed;
+    top: 50%;
+    left: 20px;
+    transform: translateY(-50%);
+    width: 72px;
+    height: 85vh;
+    background-color: var(--sidebar-bg);
+    border-radius: 20px;
+    padding: 20px 0;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.sidebar-top, .sidebar-main, .sidebar-bottom {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    color: var(--icon-color);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    position: relative; 
+}
+
+.sidebar-link i {
+    width: 24px;
+    height: 24px;
+}
+
+
+.sidebar-link:not(.active):hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--active-icon-color);
+}
+
+
+.sidebar-link.active {
+    background-color: var(--active-bg);
+    color: var(--active-icon-color);
+}
+
+.logo-link {
+    color: #00BFFF;
+}
+
+.main-content {
+    margin-left: 112px;
+    width: calc(100% - 112px);
+    padding: 20px;
+}
+
+.sidebar-link[data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: 80px; 
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: var(--tooltip-bg);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.sidebar-link[data-tooltip]:hover::after {
+    opacity: 1;
+    visibility: visible;
+}

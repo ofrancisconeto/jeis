@@ -1,0 +1,383 @@
+{% extends 'base.html' %}
+
+{% block title %}Votação de Logos{% endblock %}
+
+{% block content %}
+<style>
+    /* Reset e variáveis */
+    .main-content {
+        background: var(--cor-branco);
+        min-height: calc(100vh - 72px);
+        padding: 2rem 1rem;
+    }
+
+    /* Container principal */
+    .voting-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    /* Header da votação */
+    .voting-header {
+        text-align: center;
+        margin-bottom: 3rem;
+        animation: fadeInUp 0.8s ease-out;
+    }
+
+    .voting-title {
+        font-size: clamp(2.5rem, 5vw, 3.5rem);
+        font-weight: 800;
+        color: var(--cor-texto);
+        margin-bottom: 1rem;
+        line-height: 1.2;
+    }
+
+    .voting-subtitle {
+        font-size: 1.2rem;
+        color: rgba(24, 28, 50, 0.7);
+        max-width: 600px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    /* Botão adicionar (admin) */
+    .admin-controls {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 2rem;
+    }
+
+    .btn-add {
+        background: linear-gradient(135deg, var(--cor-primaria), var(--cor-secundaria));
+        color: var(--cor-branco);
+        padding: 14px 28px;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 16px;
+        box-shadow: 0 4px 15px rgba(30, 152, 79, 0.3);
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-add:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(30, 152, 79, 0.4);
+        text-decoration: none;
+        color: var(--cor-branco);
+    }
+
+    /* Grid de logos - 3 por linha */
+    .logos-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+        margin-bottom: 4rem;
+    }
+
+    /* Card da logo - altura mínima definida */
+    .logo-card {
+        background: var(--cor-branco);
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        border: 2px solid #f1f5f9;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        animation: fadeInUp 0.8s ease-out;
+        min-height: 380px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .logo-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        border-color: var(--cor-primaria);
+    }
+
+    /* Container da imagem - altura aumentada */
+    .logo-image-container {
+        position: relative;
+        width: 100%;
+        height: 200px;
+        background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .logo-card .imagem {
+        max-width: 120px;
+        max-height: 120px;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+        transition: transform 0.3s ease;
+        filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+    }
+
+    .logo-card:hover .imagem {
+        transform: scale(1.05);
+    }
+
+    /* Conteúdo do card - altura flexível */
+    .logo-content {
+        padding: 1.2rem;
+        min-height: 120px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+    }
+
+    .logo-card h3 {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--cor-texto);
+        margin-bottom: 1.2rem;
+        text-align: center;
+        line-height: 1.4;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        hyphens: auto;
+        flex-grow: 0;
+        flex-shrink: 0;
+    }
+
+    /* Contador de votos */
+    .vote-count {
+        background: linear-gradient(135deg, var(--cor-primaria), var(--cor-secundaria));
+        color: var(--cor-branco);
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 600;
+        text-align: center;
+        margin-bottom: 1rem;
+        display: inline-block;
+        width: 100%;
+    }
+
+    /* Botões de ação */
+    .card-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .btn-action {
+        padding: 10px 16px;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 14px;
+        text-align: center;
+        transition: all 0.3s ease;
+        border: 1px solid;
+    }
+
+    .btn-details {
+        background: var(--cor-primaria);
+        color: var(--cor-branco);
+        border-color: var(--cor-primaria);
+    }
+
+    .btn-details:hover {
+        background: transparent;
+        color: var(--cor-primaria);
+        text-decoration: none;
+        transform: translateY(-1px);
+    }
+
+    .btn-edit {
+        background: var(--cor-alerta);
+        color: var(--cor-branco);
+        border-color: var(--cor-alerta);
+    }
+
+    .btn-edit:hover {
+        background: transparent;
+        color: var(--cor-alerta);
+        text-decoration: none;
+        transform: translateY(-1px);
+    }
+
+    .btn-delete {
+        background: var(--cor-erro);
+        color: var(--cor-branco);
+        border-color: var(--cor-erro);
+    }
+
+    .btn-delete:hover {
+        background: transparent;
+        color: var(--cor-erro);
+        text-decoration: none;
+        transform: translateY(-1px);
+    }
+
+    .admin-actions {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 8px;
+    }
+
+    .admin-actions .btn-action {
+        flex: 1;
+        font-size: 12px;
+        padding: 8px 12px;
+    }
+
+    /* Animações */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Badge para destacar */
+    .contest-badge {
+        background: linear-gradient(135deg, var(--cor-alerta), #ff8f00);
+        color: var(--cor-branco);
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        z-index: 10;
+        box-shadow: 0 2px 8px rgba(255, 183, 1, 0.4);
+    }
+
+    /* Empty state */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: rgba(24, 28, 50, 0.6);
+    }
+
+    .empty-state h3 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        color: var(--cor-texto);
+    }
+
+    /* Responsividade - ajustado para 3 colunas */
+    @media (max-width: 992px) {
+        .logos-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .logos-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+        
+        .logo-image-container {
+            height: 160px;
+        }
+        
+        .logo-card .imagem {
+            max-width: 100px;
+            max-height: 100px;
+        }
+        
+        .admin-actions {
+            flex-direction: column;
+        }
+        
+        .admin-actions .btn-action {
+            flex: none;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .voting-container {
+            padding: 0 10px;
+        }
+        
+        .logo-content {
+            padding: 1rem;
+        }
+    }
+</style>
+
+<div class="voting-container">
+    <!-- Header da votação -->
+    <div class="voting-header">
+        <h1 class="voting-title">Logos do JEIS 2025</h1>
+        <p class="voting-subtitle">Clique em uma logo para votar. Lembre-se, o voto é único!</p>
+    </div>
+
+    <!-- Controles do admin -->
+    {% if user.is_authenticated and user.is_superuser %}
+    <div class="admin-controls">
+        <a href="{% url 'adicionar' %}" class="btn-add">
+            ➕ Adicionar Nova Logo
+        </a>
+    </div>
+    {% endif %}
+
+    <!-- Grid de logos -->
+    <div class="logos-grid">
+        {% for logo in logos %}
+            <div class="logo-card">
+                <!-- Badge de contest -->
+                <div class="contest-badge">JEIS 2025</div>
+                
+                <!-- Container da imagem -->
+                <div class="logo-image-container">
+                    <img class="imagem" src="{{ logo.imagem.url }}" alt="{{ logo.titulo }}">
+                </div>
+                
+                <!-- Conteúdo do card -->
+                <div class="logo-content">
+                    <h3>{{ logo.titulo }}</h3>
+                    
+                    <!-- Ações do card -->
+                    <div class="card-actions">
+                        <!-- Botões admin -->
+                        {% if user.is_authenticated and user.is_superuser %}
+                        <div class="admin-actions">
+                            <a href="{% url 'editar' logo.id %}" class="btn-action btn-edit">✏️ Editar</a>
+                            <a href="{% url 'deletar' logo.id %}" class="btn-action btn-delete">🗑️ Remover</a>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Botão ver detalhes -->
+                        <a href="{% url 'ver_detalhes' logo.id %}" class="btn-action btn-details">
+                            👁️ Ver Detalhes & Votar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="empty-state">
+                <h3>🎨 Nenhuma logo cadastrada ainda</h3>
+                <p>As logos das turmas aparecerão aqui quando forem adicionadas.</p>
+                {% if user.is_superuser %}
+                <a href="{% url 'adicionar' %}" class="btn-add" style="margin-top: 1rem; display: inline-flex;">
+                    ➕ Adicionar Primeira Logo
+                </a>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

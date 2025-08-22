@@ -1,0 +1,96 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JEIS - Criar Conta</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo-section">
+            <img src="{% static 'css/sesi.png' %}" alt="Logo SESI">
+            <h1>Criar Conta de Aluno</h1>
+            <p class="subtitle">Jogos Esportivos Internos</p>
+        </div>
+
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="message {{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="POST" action="{% url 'cadastrar' %}">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="nome">Nome Completo:</label>
+                <input type="text" name="nome" id="nome" placeholder="Digite seu nome completo" required>
+            </div>
+            
+            <!-- A CORREÇÃO ESTÁ AQUI: o name é "cpf" -->
+            <div class="form-group">
+                <label for="cpf">CPF:</label>
+                <input type="text" name="cpf" id="cpf" placeholder="Digite seu CPF" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="turma">Turma:</label>
+                <select name="turma" id="turma" class="form-control" required>
+                    <option value="" disabled selected>Selecione sua turma</option>
+                    <option value="9A">9A</option>
+                    <option value="9B">9B</option>
+                    <option value="1A">1A</option>
+                    <option value="1B">1B</option>
+                    <option value="2DS1">2DS1</option>
+                    <option value="2DS2">2DS2</option>
+                    <option value="2A">2A</option>
+                    <option value="3CN">3CN</option>
+                    <option value="3E">3E</option>
+                    <option value="3DS">3DS</option>
+                    <option value="3EM">3EM</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="senha">Crie uma Senha:</label>
+                <div class="password-field">
+                    <input type="password" name="senha" id="senha" placeholder="Crie sua senha" required>
+                    <button type="button" class="password-toggle" onclick="togglePassword()">👁️</button>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-login">Criar Conta</button>
+        </form>
+
+        <div class="register-link">
+            Já tem uma conta? <a href="{% url 'entrar' %}">Faça login</a>
+        </div>
+    </div>
+    <script>
+        function togglePassword() {
+            const passwordField = document.getElementById('senha');
+            const toggleBtn = document.querySelector('.password-toggle');
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                toggleBtn.textContent = '🙈';
+            } else {
+                passwordField.type = 'password';
+                toggleBtn.textContent = '👁️';
+            }
+        }
+        document.getElementById('cpf').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 11) value = value.slice(0, 11);
+            value = value.replace(/(\d{3})(\d)/, '$1.$2');
+            value = value.replace(/(\d{3})(\d)/, '$1.$2');
+            value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+            e.target.value = value;
+        });
+    </script>
+</body>
+</html>

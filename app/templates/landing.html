@@ -1,0 +1,342 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JEIS 2025 - A Contagem Começou!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cor-primaria: #1e984f;
+            --cor-secundaria: #008999;
+            --cor-alerta: #ffb701;
+            --cor-erro: #e12229;
+            --cor-texto: #181c32;
+            --cor-branco: #ffffff;
+            --cor-fundo-claro: #f8fafc;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--cor-fundo-claro);
+            color: var(--cor-texto);
+            overflow-x: hidden;
+        }
+        
+        /* --- BACKGROUND SUTIL E ANIMADO --- */
+        .background-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(150px);
+            opacity: 0.15;
+            animation: float 20s infinite ease-in-out alternate;
+        }
+        .shape1 {
+            width: 500px;
+            height: 500px;
+            background: var(--cor-primaria);
+            top: -100px;
+            left: -150px;
+        }
+        .shape2 {
+            width: 600px;
+            height: 600px;
+            background: var(--cor-secundaria);
+            bottom: -150px;
+            right: -200px;
+            animation-delay: 5s;
+        }
+        
+        /* --- HEADER --- */
+        .header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 40px;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            z-index: 1000;
+        }
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .logo {
+            font-size: 28px;
+            font-weight: 900;
+            color: var(--cor-texto);
+        }
+        .login-btn {
+            padding: 14px 28px;
+            background: var(--cor-primaria);
+            color: var(--cor-branco);
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(30, 152, 79, 0.2);
+            text-decoration: none;
+        }
+        .login-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 30px rgba(30, 152, 79, 0.3);
+        }
+
+        /* --- CONTEÚDO PRINCIPAL --- */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 120px 20px 60px;
+            text-align: center;
+        }
+        .main-headline {
+            font-size: clamp(3rem, 10vw, 7rem);
+            font-weight: 900;
+            margin-bottom: 1rem;
+            color: transparent;
+            background: linear-gradient(90deg, var(--cor-primaria), var(--cor-secundaria));
+            background-clip: text;
+            -webkit-background-clip: text;
+            animation: slideInDown 1s ease-out;
+        }
+        .sub-headline {
+            font-size: clamp(1.3rem, 4vw, 1.8rem);
+            margin-bottom: 4rem;
+            color: var(--cor-texto);
+            opacity: 0.7;
+            animation: slideInDown 1s ease-out 0.2s both;
+        }
+        .countdown-container {
+            background: var(--cor-branco);
+            border-radius: 30px;
+            padding: 40px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            animation: zoomIn 1s ease-out 0.4s both;
+            width: 100%;
+            max-width: 700px;
+        }
+        .countdown { display: flex; gap: 20px; justify-content: space-around; flex-wrap: wrap; }
+        .countdown-item { min-width: 80px; }
+        .countdown-number {
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            font-weight: 700;
+            color: var(--cor-texto);
+            margin-bottom: 10px;
+            line-height: 1;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+        .countdown-item:hover .countdown-number {
+            color: var(--cor-primaria);
+            transform: scale(1.1);
+        }
+        .countdown-label {
+            font-size: clamp(0.8rem, 2vw, 1rem);
+            color: var(--cor-texto);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0.6;
+        }
+
+        /* --- SEÇÕES DE CONTEÚDO --- */
+        .content-section {
+            padding: 100px 2rem;
+            background: var(--cor-branco);
+            position: relative;
+        }
+        .section-header { text-align: center; margin-bottom: 4rem; }
+        .section-badge {
+            background: linear-gradient(135deg, var(--cor-primaria), var(--cor-secundaria));
+            color: var(--cor-branco);
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1.5rem;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(30, 152, 79, 0.3);
+        }
+        .section-title {
+            font-size: clamp(2.5rem, 5vw, 3.5rem);
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+        .section-subtitle {
+            font-size: 1.2rem;
+            color: rgba(24, 28, 50, 0.7);
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 4rem auto 0;
+        }
+        .info-card {
+            background: var(--cor-fundo-claro);
+            border: 1px solid transparent;
+            border-radius: 24px;
+            padding: 2rem;
+            transition: all 0.4s ease;
+            text-align: center;
+        }
+        .info-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            border-color: var(--cor-primaria);
+            background: var(--cor-branco);
+        }
+        .card-icon { font-size: 3rem; margin-bottom: 1.5rem; display: block; }
+        .card-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; }
+        .card-description { color: rgba(24, 28, 50, 0.7); line-height: 1.7; }
+
+        /* --- ANIMAÇÕES --- */
+        @keyframes float {
+            from { transform: translateY(20px) translateX(-10px) rotate(0deg); }
+            to { transform: translateY(-20px) translateX(10px) rotate(90deg); }
+        }
+        @keyframes slideInDown {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes zoomIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- RESPONSIVIDADE --- */
+        @media (max-width: 768px) {
+            .header { padding: 15px 20px; }
+            .logo { font-size: 24px; }
+            .login-btn { padding: 12px 20px; font-size: 14px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="background-container">
+        <div class="shape shape1"></div>
+        <div class="shape shape2"></div>
+    </div>
+
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">JEIS 2025</div>
+            <a href="{% url 'entrar' %}" class="login-btn">Entrar no Jogo</a>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <h1 class="main-headline">O JOGO VAI COMEÇAR</h1>
+        <p class="sub-headline">A contagem regressiva para o maior evento esportivo do ano já começou.</p>
+        
+        <div class="countdown-container">
+            <div class="countdown">
+                <div class="countdown-item"><div class="countdown-number" id="months">00</div><div class="countdown-label">Meses</div></div>
+                <div class="countdown-item"><div class="countdown-number" id="days">00</div><div class="countdown-label">Dias</div></div>
+                <div class="countdown-item"><div class="countdown-number" id="hours">00</div><div class="countdown-label">Horas</div></div>
+                <div class="countdown-item"><div class="countdown-number" id="minutes">00</div><div class="countdown-label">Minutos</div></div>
+                <div class="countdown-item"><div class="countdown-number" id="seconds">00</div><div class="countdown-label">Segundos</div></div>
+            </div>
+        </div>
+    </main>
+
+    <section class="content-section">
+        <div class="section-header fade-in">
+            <div class="section-badge">🏆 O JEIS</div>
+            <h2 class="section-title">Mais que um Jogo, uma Lenda.</h2>
+            <p class="section-subtitle">Prepare-se para viver momentos de pura adrenalina, competir com garra e criar memórias que vão durar para sempre.</p>
+        </div>
+        <div class="cards-grid">
+            <div class="info-card fade-in">
+                <div class="card-icon">💪</div>
+                <h3 class="card-title">Espírito Competitivo</h3>
+                <p class="card-description">Mostre seu talento, defenda sua turma e lute pela glória. A competição está no nosso sangue.</p>
+            </div>
+            <div class="info-card fade-in">
+                <div class="card-icon">🤝</div>
+                <h3 class="card-title">União e Respeito</h3>
+                <p class="card-description">Rivalidade só dentro de campo. Fora dele, somos uma só comunidade, unida pela paixão ao esporte.</p>
+            </div>
+            <div class="info-card fade-in">
+                <div class="card-icon">🎉</div>
+                <h3 class="card-title">Celebração Épica</h3>
+                <p class="card-description">O JEIS é uma festa. A torcida, a música, a energia... cada momento é uma celebração da nossa união.</p>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        const targetDate = new Date("2025-10-15T08:00:00").getTime();
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = targetDate - now;
+            if (distance < 0) {
+                document.getElementById("months").textContent = "00";
+                document.getElementById("days").textContent = "00";
+                document.getElementById("hours").textContent = "00";
+                document.getElementById("minutes").textContent = "00";
+                document.getElementById("seconds").textContent = "00";
+                return;
+            }
+            const months = Math.floor(distance / (1000 * 60 * 60 * 24 * 30.44));
+            const days = Math.floor((distance % (1000 * 60 * 60 * 24 * 30.44)) / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            document.getElementById("months").textContent = months.toString().padStart(2, '0');
+            document.getElementById("days").textContent = days.toString().padStart(2, '0');
+            document.getElementById("hours").textContent = hours.toString().padStart(2, '0');
+            document.getElementById("minutes").textContent = minutes.toString().padStart(2, '0');
+            document.getElementById("seconds").textContent = seconds.toString().padStart(2, '0');
+        }
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+    </script>
+</body>
+</html>

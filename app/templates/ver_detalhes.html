@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Comentarios{% endblock %}
+
+    <h1>Comentarios</h1>
+
+{% block content %}
+
+
+<div class="logo-card">
+    <h3>{{ logo.titulo }}</h3>
+    <img class="imagem" style="width: 500px; height: 500px;" src="{{ logo.imagem.url }}" alt="{{ logo.titulo }}">
+    <p>{{ logo.descricao }}</p>
+    <form method="post" action="{% url 'votar' logo_id=logo.id %}">
+        {% csrf_token %}
+        <button type="submit">Votar</button>
+    </form>
+    <p>Votos: {{ logo.votos }}</p>
+</div>
+
+
+
+
+{% if comentarios %}
+    
+    <form method="post" action="{% url 'adicionarcomentario' logo_id=logo_id %}">
+        {% csrf_token %}
+        <h1>Comentario para a Logo: {{ comentarios|length }}</h1>
+        <textarea name="texto" rows="4" cols="50" required></textarea><br>
+        <button type="submit">Enviar</button>
+        <a href="{% url 'index'  %}">Voltar</a>
+    </form>
+
+{% else %}
+    <form method="post" action="{% url 'adicionarcomentario' logo_id=logo_id %}">
+        {% csrf_token %}
+        <h1>Comentario para a Logo: {{ comentarios|length }} </h1>
+        <p>Não há comentarios ainda.</p>
+        <textarea name="texto" rows="4" cols="50" required></textarea><br>
+        <button type="submit">Enviar</button>
+        <a href="{% url 'index' %}">Voltar</a>
+    </form>
+    
+
+{% endif %}
+<ul>
+    {% for comentario in comentarios %}
+        <li>
+            <strong>{{ comentario.usuario.first_name }}:</strong> 
+            <p>{{ comentario.comentario }}</p>
+
+            <!-- Use o novo atributo vindo da view -->
+            <h5> ({{ comentario.tempo_formatado }})</h5> <br>
+            {% if user.is_authenticated and user.is_superuser %}
+            <a href="{% url 'deletarcomentario' comentario.id %}">Deletar</a>
+            {% endif %}
+        </li>
+    {% endfor %}
+</ul>
+
+{% endblock %}

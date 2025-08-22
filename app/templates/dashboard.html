@@ -1,0 +1,555 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Resultados da Votação{% endblock %}
+
+{% block content %}
+<style>
+    /* Melhorias específicas para o dashboard */
+    .dashboard-header {
+        background: linear-gradient(135deg, var(--cor-branco), #f8fafc);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border: 1px solid var(--cor-borda-suave);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .dashboard-header h1 {
+        color: var(--cor-texto);
+        font-size: 2.2rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+    }
+
+    .dashboard-header p {
+        color: rgba(24, 28, 50, 0.7);
+        font-size: 1.1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Stats cards melhorados */
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: var(--cor-branco);
+        border-radius: 16px;
+        padding: 1.8rem;
+        text-align: center;
+        border: 1px solid var(--cor-borda-suave);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--cor-primaria), var(--cor-secundaria), var(--cor-alerta));
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .stat-card:hover::before {
+        opacity: 1;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+    }
+
+    .stat-card h4 {
+        font-size: 0.9rem;
+        color: rgba(24, 28, 50, 0.6);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.8rem;
+    }
+
+    .stat-card p {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: var(--cor-texto);
+        margin: 0;
+        line-height: 1;
+    }
+
+    /* Layout dos gráficos */
+    .main-container {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .charts-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .chart-card {
+        background: var(--cor-branco);
+        border-radius: 16px;
+        padding: 1.8rem;
+        border: 1px solid var(--cor-borda-suave);
+        transition: all 0.3s ease;
+    }
+
+    .chart-card:hover {
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    .chart-card h3 {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--cor-texto);
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+
+    /* Tabelas compactas */
+    .table-container {
+        background: var(--cor-branco);
+        border-radius: 16px;
+        padding: 1.8rem;
+        border: 1px solid var(--cor-borda-suave);
+        margin-bottom: 2rem;
+        overflow-x: auto;
+    }
+
+    .table-container h3 {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--cor-texto);
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+
+    /* Tabela mais compacta */
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+    }
+
+    .table th {
+        background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+        color: var(--cor-texto);
+        font-weight: 600;
+        text-align: left;
+        padding: 12px 16px;
+        border-bottom: 2px solid var(--cor-borda-suave);
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .table td {
+        padding: 10px 16px;
+        border-bottom: 1px solid var(--cor-borda-suave);
+        color: var(--cor-texto);
+        vertical-align: middle;
+    }
+
+    .table tbody tr {
+        transition: background-color 0.2s ease;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f8fafc;
+    }
+
+    .table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    /* Barra de progresso compacta */
+    .progress-bar-container {
+        width: 100%;
+        background-color: #e2e8f0;
+        border-radius: 10px;
+        height: 16px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .progress-bar {
+        background: linear-gradient(90deg, var(--cor-primaria), var(--cor-secundaria));
+        height: 100%;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--cor-branco);
+        font-size: 0.7rem;
+        font-weight: 600;
+        min-width: 20px;
+        transition: width 0.5s ease;
+        position: relative;
+    }
+
+    .progress-bar::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        animation: shimmer 2s infinite;
+    }
+
+    @keyframes shimmer {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+    }
+
+    /* Botão melhorado */
+    .btn {
+        font-family: 'Poppins', sans-serif;
+        border-radius: 12px;
+        padding: 12px 24px;
+        font-weight: 600;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-primario {
+        background: linear-gradient(135deg, var(--cor-primaria), var(--cor-secundaria));
+        color: var(--cor-branco);
+        border: none;
+        box-shadow: 0 4px 15px rgba(30, 152, 79, 0.3);
+    }
+
+    .btn-primario:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(30, 152, 79, 0.4);
+        text-decoration: none;
+        color: var(--cor-branco);
+    }
+
+    /* Estado vazio das tabelas */
+    .table tbody tr td[colspan] {
+        text-align: center;
+        color: rgba(24, 28, 50, 0.5);
+        font-style: italic;
+        padding: 2rem;
+    }
+
+    /* Responsividade melhorada */
+    @media (max-width: 992px) {
+        .charts-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+        
+        .stats-container {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .stats-container {
+            grid-template-columns: 1fr;
+        }
+        
+        .dashboard-header {
+            padding: 1.5rem;
+        }
+        
+        .dashboard-header h1 {
+            font-size: 1.8rem;
+        }
+        
+        .chart-card,
+        .table-container {
+            padding: 1.2rem;
+        }
+        
+        .table {
+            font-size: 0.8rem;
+        }
+        
+        .table th,
+        .table td {
+            padding: 8px 12px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .dashboard-header h1 {
+            font-size: 1.5rem;
+        }
+        
+        .stat-card p {
+            font-size: 1.8rem;
+        }
+        
+        .table th,
+        .table td {
+            padding: 6px 8px;
+        }
+    }
+
+    /* Animações de entrada */
+    .dashboard-header,
+    .stat-card,
+    .chart-card,
+    .table-container {
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .stat-card:nth-child(2) { animation-delay: 0.1s; }
+    .stat-card:nth-child(3) { animation-delay: 0.2s; }
+    .stat-card:nth-child(4) { animation-delay: 0.3s; }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<div class="dashboard-header">
+    <h1>Dashboard de Votação</h1>
+    <p>Resultados em tempo real da competição de logos do JEIS 2025.</p>
+    
+    <a href="{% url 'gerenciar_ia' %}" class="btn btn-primario">
+        🤖 Gerenciar Murilão AI
+    </a>
+</div>
+
+<!-- 1. Indicadores Principais -->
+<div class="stats-container">
+    <div class="stat-card card">
+        <h4>Alunos Cadastrados</h4>
+        <p>{{ total_alunos }}</p>
+    </div>
+    <div class="stat-card card">
+        <h4>Alunos Votantes</h4>
+        <p>{{ total_votantes }}</p>
+    </div>
+    <div class="stat-card card">
+        <h4>Participação Geral</h4>
+        <p>{{ percentual_participacao }}%</p>
+    </div>
+    <div class="stat-card card">
+        <h4>Logo Mais Votada</h4>
+        <p style="font-size: 1.2rem;">{{ logo_mais_votada.titulo|default:"N/A" }}</p>
+    </div>
+</div>
+
+<div class="main-container">
+    <!-- 2. Gráficos Principais -->
+    <div class="charts-grid">
+        <div class="chart-card card">
+            <h3>📊 Votos por Logo</h3>
+            <canvas id="barChart"></canvas>
+        </div>
+        <div class="chart-card card">
+            <h3>🍩 Distribuição de Votos</h3>
+            <canvas id="doughnutChart"></canvas>
+        </div>
+    </div>
+    
+    <!-- 3. Gráfico: Evolução dos Votos -->
+    <div class="chart-card card">
+        <h3>📈 Evolução dos Votos por Dia</h3>
+        <canvas id="lineChart"></canvas>
+    </div>
+
+    <!-- 4. Tabela: Participação por Turma -->
+    <div class="table-container card">
+        <h3>🎓 Participação por Turma</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Turma</th>
+                    <th>Cadastrados</th>
+                    <th>Votantes</th>
+                    <th style="width: 200px;">Participação</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in dados_por_turma %}
+                <tr>
+                    <td><strong>{{ item.turma }}</strong></td>
+                    <td>{{ item.cadastrados }}</td>
+                    <td>{{ item.votantes }}</td>
+                    <td>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" style="width: {{ item.percentual }}%;">
+                                {{ item.percentual }}%
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4">Nenhum dado de turma disponível.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 5. Tabela: Resumo por Logo -->
+    <div class="table-container card">
+        <h3>🏆 Resumo por Logo</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Logo</th>
+                    <th>Votos</th>
+                    <th>Percentual</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in dados_tabela_logos %}
+                <tr>
+                    <td><strong>{{ item.titulo }}</strong></td>
+                    <td>{{ item.votos }}</td>
+                    <td>{{ item.percentual }}%</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3">Nenhuma logo cadastrada ainda.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // --- DADOS DO BACKEND ---
+    const logoTitles = JSON.parse('{{ logo_titles_json|escapejs }}');
+    const voteCounts = JSON.parse('{{ vote_counts_json|escapejs }}');
+    const datasGrafico = JSON.parse('{{ datas_grafico_json|escapejs }}');
+    const contagemGrafico = JSON.parse('{{ contagem_grafico_json|escapejs }}');
+    const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--cor-primaria').trim();
+
+    // --- CONFIGURAÇÕES GLOBAIS DOS GRÁFICOS ---
+    Chart.defaults.font.family = 'Poppins';
+    Chart.defaults.color = '#181c32';
+
+    // --- GRÁFICOS ---
+
+    // 1. Bar Chart (Votos por Logo)
+    const barCtx = document.getElementById('barChart').getContext('2d');
+    new Chart(barCtx, { 
+        type: 'bar', 
+        data: { 
+            labels: logoTitles, 
+            datasets: [{ 
+                label: 'Número de Votos', 
+                data: voteCounts, 
+                backgroundColor: 'rgba(30, 152, 79, 0.8)', 
+                borderColor: primaryColor, 
+                borderWidth: 2, 
+                borderRadius: 8, 
+                borderSkipped: false 
+            }] 
+        }, 
+        options: { 
+            scales: { 
+                y: { 
+                    beginAtZero: true, 
+                    ticks: { precision: 0 },
+                    grid: { color: 'rgba(0,0,0,0.05)' }
+                },
+                x: {
+                    grid: { display: false }
+                }
+            }, 
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            }
+        } 
+    });
+
+    // 2. Doughnut Chart (Distribuição)
+    const doughnutCtx = document.getElementById('doughnutChart').getContext('2d');
+    new Chart(doughnutCtx, { 
+        type: 'doughnut', 
+        data: { 
+            labels: logoTitles, 
+            datasets: [{ 
+                label: 'Votos', 
+                data: voteCounts, 
+                backgroundColor: ['#1e984f', '#008999', '#ffb701', '#e12229', '#5E6278', '#A1A5B7'],
+                borderColor: '#ffffff', 
+                borderWidth: 3 
+            }] 
+        }, 
+        options: { 
+            responsive: true, 
+            cutout: '65%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { padding: 20, usePointStyle: true }
+                }
+            }
+        } 
+    });
+
+    // 3. Line Chart (Evolução por Dia)
+    const lineCtx = document.getElementById('lineChart').getContext('2d');
+    new Chart(lineCtx, {
+        type: 'line',
+        data: {
+            labels: datasGrafico,
+            datasets: [{
+                label: 'Votos Registrados',
+                data: contagemGrafico,
+                borderColor: primaryColor,
+                backgroundColor: 'rgba(30, 152, 79, 0.1)',
+                fill: true,
+                tension: 0.4,
+                borderWidth: 3,
+                pointBackgroundColor: primaryColor,
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 2,
+                pointRadius: 5
+            }]
+        },
+        options: {
+            scales: { 
+                y: { 
+                    beginAtZero: true, 
+                    ticks: { precision: 0 },
+                    grid: { color: 'rgba(0,0,0,0.05)' }
+                },
+                x: {
+                    grid: { display: false }
+                }
+            },
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+</script>
+
+{% endblock %}

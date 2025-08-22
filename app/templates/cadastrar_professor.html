@@ -1,0 +1,75 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JEIS - Cadastrar Professor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+</head>
+<body>
+    
+    <main class="login-container">
+        <div class="logo-section">
+            <img src="{% static 'css/sesi.png' %}" alt="Logo SESI"> 
+            <h1>Cadastrar Professor</h1>
+            <p class="subtitle">Acesso de Professor/Administrador</p>
+        </div>
+
+        
+
+        <form method="POST" action="{% url 'cadastrar_professor' %}">
+            {% csrf_token %}
+            
+            <!-- O restante do seu formulário continua igual -->
+            <div class="form-group">
+                <label for="nomeInput">Nome Completo</label>
+                <input name="nome" type="text" class="form-control" id="nomeInput" placeholder="Insira o nome do professor" required>
+            </div>
+            <div class="form-group">
+                <label for="usuarioInput">CPF</label>
+                <input type="text" name="username" id="usuarioInput" placeholder="Ex: 123.456.789-00" required>
+            </div>
+            <div class="form-group">
+                <label for="senha">Senha</label>
+                <div class="password-field">
+                    <input type="password" name="senha" id="senha" placeholder="Crie uma senha forte" required>
+                    <button type="button" class="password-toggle" onclick="togglePassword()">👁️</button>
+                </div>
+            </div>
+            <button type="submit" class="btn-login">Cadastrar Professor</button>
+        </form>
+
+        <div class="register-link">
+            Voltar para o <a href="{% url 'entrar' %}">Login</a>
+        </div>
+    </main>
+
+    <!-- Seu JavaScript continua igual -->
+    <script>
+        function togglePassword() {
+            const passwordField = document.getElementById('senha');
+            const toggleBtn = document.querySelector('.password-toggle');
+            
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                toggleBtn.textContent = '🙈';
+            } else {
+                passwordField.type = 'password';
+                toggleBtn.textContent = '👁️';
+            }
+        }
+        document.getElementById('usuarioInput').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 11) {
+                value = value.slice(0, 11);
+            }
+            value = value.replace(/(\d{3})(\d)/, '$1.$2');
+            value = value.replace(/(\d{3})(\d)/, '$1.$2');
+            value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+            e.target.value = value;
+        });
+    </script>
+</body>
+</html>

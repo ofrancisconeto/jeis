@@ -1,0 +1,172 @@
+/* ==========================================================================
+   CSS DEDICADO PARA PÁGINAS DE LOGIN E CADASTRO
+   ========================================================================== */
+
+/* 1. Fundação e Fundo da Página */
+:root {
+    --cor-primaria: #1e984f;
+    --cor-secundaria: #008999;
+    --cor-alerta: #ffb701;
+    --cor-erro: #e12229;
+    --cor-texto: #181c32;
+    --cor-fundo: #f5f8fa;
+    --cor-branco: #ffffff;
+    --cor-borda-suave: #eff2f5;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--cor-fundo);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* 2. O Container Principal do Formulário */
+.login-container {
+    background-color: var(--cor-branco);
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    max-width: 420px;
+    width: 100%;
+    text-align: center;
+    animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.logo-section img {
+    width: 200px;
+    margin-bottom: 20px;
+}
+
+.login-container h1 {
+    color: var(--cor-texto);
+    font-size: 24px;
+    margin-bottom: 8px;
+}
+
+.login-container .subtitle {
+    color: #5E6278;
+    margin-bottom: 30px;
+}
+
+/* 3. Estilo dos Campos do Formulário */
+.form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--cor-texto);
+    font-weight: 600;
+    font-size: 14px;
+}
+
+/* A MUDANÇA PRINCIPAL ESTÁ AQUI */
+/* Aplicando os mesmos estilos para input e select */
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid var(--cor-borda-suave);
+    border-radius: 8px;
+    font-size: 16px;
+    background-color: var(--cor-fundo);
+    transition: all 0.3s ease;
+    /* Remove a aparência padrão do sistema para poder estilizar */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+/* Adicionando uma seta personalizada ao select */
+.form-group select {
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235E6278' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 1.2em;
+    padding-right: 40px; /* Espaço para a seta */
+}
+
+/* Cor do texto para a opção desabilitada */
+.form-group select:invalid {
+    color: #5E6278;
+}
+
+/* A MUDANÇA PRINCIPAL TERMINA AQUI */
+
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--cor-primaria);
+    box-shadow: 0 0 0 3px rgba(30, 152, 79, 0.1);
+}
+
+.password-field {
+    position: relative;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #A1A5B7;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+/* 4. Botão Principal e Link de Cadastro */
+.btn-login {
+    width: 100%;
+    padding: 15px;
+    background: var(--cor-primaria);
+    color: var(--cor-branco);
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
+}
+
+.btn-login:hover {
+    filter: brightness(1.1);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(30, 152, 79, 0.2);
+}
+
+.register-link {
+    font-size: 14px;
+}
+
+.register-link a {
+    color: var(--cor-primaria);
+    font-weight: 600;
+    text-decoration: none;
+}

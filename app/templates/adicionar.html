@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Adicionar Nova Logo{% endblock %}
+
+{% block content %}
+
+    <!-- O conteúdo da sua página vai aqui dentro -->
+    <div class="card">
+        <h3>Adicionar Nova Logo</h3>
+        <form method="POST" action="{% url 'adicionar' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="titulo">Título da Logo (Ex: 3º Ano A):</label>
+                <input type="text" name="titulo" id="titulo" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label for="descricao">Descrição:</label>
+                <textarea name="descricao" id="descricao" class="form-control" rows="4" placeholder="Fale um pouco sobre a inspiração para esta logo..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="logo">Arquivo da Imagem:</label>
+                <input type="file" name="logo" id="logo" class="form-control form-control-file" required>
+            </div>
+
+            <!-- Botões dentro de um container para melhor alinhamento -->
+            <div class="form-buttons">
+                <button type="submit" class="btn btn-primario">Salvar Logo</button>
+                <a href="{% url 'index' %}" class="btn btn-secundario">Voltar</a>
+            </div>
+
+        </form>
+    </div>
+
+{% endblock %}

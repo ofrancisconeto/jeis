@@ -1,0 +1,497 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Murilão AI - Pergunte Tudo sobre o JEIS{% endblock %}
+
+{% block content %}
+<style>
+    /* Container principal do chat */
+    .chat-container {
+        height: calc(100vh - 72px);
+        display: flex;
+        flex-direction: column;
+        max-width: 900px;
+        margin: 0 auto;
+        background: var(--cor-branco);
+        border-radius: 12px 12px 0 0;
+        overflow: hidden;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Header do chat */
+    .chat-header {
+        background: linear-gradient(135deg, var(--cor-primaria), var(--cor-secundaria));
+        color: var(--cor-branco);
+        padding: 1.5rem 2rem;
+        text-align: center;
+        position: relative;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .chat-header h1 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .chat-header p {
+        font-size: 1rem;
+        opacity: 0.9;
+        margin: 0;
+    }
+
+    .ai-avatar {
+        width: 40px;
+        height: 40px;
+        background: var(--cor-alerta);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        font-weight: bold;
+        color: var(--cor-branco);
+    }
+
+    /* Área de mensagens */
+    .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 1.5rem;
+        background: #f8fafc;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        scroll-behavior: smooth;
+    }
+
+    /* Mensagem individual */
+    .message {
+        display: flex;
+        margin-bottom: 1rem;
+        animation: slideInMessage 0.3s ease-out;
+    }
+
+    .message.user {
+        justify-content: flex-end;
+    }
+
+    .message.ai {
+        justify-content: flex-start;
+    }
+
+    /* Bolha da mensagem */
+    .message-bubble {
+        max-width: 70%;
+        padding: 1rem 1.25rem;
+        border-radius: 20px;
+        font-size: 1rem;
+        line-height: 1.5;
+        word-wrap: break-word;
+        position: relative;
+    }
+
+    /* Mensagem do usuário */
+    .message.user .message-bubble {
+        background: linear-gradient(135deg, var(--cor-primaria), var(--cor-secundaria));
+        color: var(--cor-branco);
+        border-bottom-right-radius: 6px;
+        box-shadow: 0 2px 10px rgba(30, 152, 79, 0.3);
+    }
+
+    /* Mensagem da IA */
+    .message.ai .message-bubble {
+        background: var(--cor-branco);
+        color: var(--cor-texto);
+        border: 1px solid #e2e8f0;
+        border-bottom-left-radius: 6px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Avatar da mensagem */
+    .message-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 14px;
+        margin: 0 10px;
+        flex-shrink: 0;
+    }
+
+    .message.user .message-avatar {
+        background: linear-gradient(135deg, var(--cor-secundaria), var(--cor-primaria));
+        color: var(--cor-branco);
+        order: 2;
+    }
+
+    .message.ai .message-avatar {
+        background: var(--cor-alerta);
+        color: var(--cor-branco);
+    }
+
+    /* Área de entrada do chat */
+    .chat-input-area {
+        background: var(--cor-branco);
+        border-top: 1px solid #e2e8f0;
+        padding: 1.5rem;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Formulário de entrada */
+    .chat-form {
+        display: flex;
+        gap: 12px;
+        align-items: flex-end;
+        max-width: 100%;
+    }
+
+    .chat-input {
+        flex: 1;
+        background: #f8fafc;
+        border: 2px solid #e2e8f0;
+        border-radius: 25px;
+        padding: 12px 20px;
+        font-size: 1rem;
+        resize: none;
+        min-height: 50px;
+        max-height: 120px;
+        transition: all 0.3s ease;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .chat-input:focus {
+        outline: none;
+        border-color: var(--cor-primaria);
+        background: var(--cor-branco);
+        box-shadow: 0 0 0 3px rgba(30, 152, 79, 0.1);
+    }
+
+    .chat-input::placeholder {
+        color: #a1a5b7;
+    }
+
+    .chat-send-btn {
+        background: linear-gradient(135deg, var(--cor-primaria), var(--cor-secundaria));
+        color: var(--cor-branco);
+        border: none;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 18px;
+        box-shadow: 0 4px 15px rgba(30, 152, 79, 0.3);
+    }
+
+    .chat-send-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(30, 152, 79, 0.4);
+    }
+
+    .chat-send-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    /* Indicador de digitação */
+    .typing-indicator {
+        display: none;
+        padding: 0.5rem 1rem;
+        color: #5e6278;
+        font-style: italic;
+        font-size: 0.9rem;
+    }
+
+    .typing-indicator.show {
+        display: block;
+        animation: fadeIn 0.3s ease-in;
+    }
+
+    /* Estado vazio */
+    .empty-chat {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: #5e6278;
+        padding: 2rem;
+    }
+
+    .empty-chat .ai-avatar {
+        width: 80px;
+        height: 80px;
+        font-size: 32px;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, var(--cor-alerta), #ff8f00);
+    }
+
+    .empty-chat h3 {
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: var(--cor-texto);
+    }
+
+    .empty-chat p {
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .suggestion-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: center;
+        max-width: 500px;
+    }
+
+    .suggestion-btn {
+        background: var(--cor-branco);
+        border: 1px solid var(--cor-primaria);
+        color: var(--cor-primaria);
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+
+    .suggestion-btn:hover {
+        background: var(--cor-primaria);
+        color: var(--cor-branco);
+        text-decoration: none;
+    }
+
+    /* Animações */
+    @keyframes slideInMessage {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    /* Responsividade */
+    @media (max-width: 768px) {
+        .chat-container {
+            height: calc(100vh - 64px);
+            border-radius: 0;
+        }
+
+        .chat-header {
+            padding: 1rem 1.5rem;
+        }
+
+        .chat-header h1 {
+            font-size: 1.5rem;
+        }
+
+        .chat-messages {
+            padding: 1rem;
+        }
+
+        .message-bubble {
+            max-width: 85%;
+        }
+
+        .chat-input-area {
+            padding: 1rem;
+        }
+
+        .suggestion-buttons {
+            flex-direction: column;
+        }
+
+        .suggestion-btn {
+            text-align: center;
+        }
+    }
+
+    /* Scrollbar personalizada */
+    .chat-messages::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .chat-messages::-webkit-scrollbar-track {
+        background: #f1f5f9;
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb {
+        background: linear-gradient(135deg, var(--cor-primaria), var(--cor-secundaria));
+        border-radius: 3px;
+    }
+</style>
+
+<div class="chat-container">
+    <!-- Header do Chat -->
+    <div class="chat-header">
+        <h1>
+            <div class="ai-avatar">🤖</div>
+            Murilão AI
+        </h1>
+        <p>Sua central de informações sobre o JEIS. Pergunte qualquer coisa!</p>
+    </div>
+
+    <!-- Área de Mensagens -->
+    <div class="chat-messages" id="chatMessages">
+        {% if query and resposta_ia %}
+            <!-- Mensagem do usuário -->
+            <div class="message user">
+                <div class="message-avatar">👤</div>
+                <div class="message-bubble">
+                    {{ query }}
+                </div>
+            </div>
+
+            <!-- Mensagem da IA -->
+            <div class="message ai">
+                <div class="message-avatar">🤖</div>
+                <div class="message-bubble">
+                    {{ resposta_ia|safe|linebreaks }}
+                </div>
+            </div>
+        {% else %}
+            <!-- Estado vazio -->
+            <div class="empty-chat">
+                <div class="ai-avatar">🤖</div>
+                <h3>Olá! Eu sou o Murilão AI</h3>
+                <p>Estou aqui para responder todas as suas dúvidas sobre o JEIS 2025. Pode perguntar qualquer coisa!</p>
+                
+                <div class="suggestion-buttons">
+                    <button class="suggestion-btn" onclick="fillInput('Quando começam os jogos?')">
+                        Quando começam os jogos?
+                    </button>
+                    <button class="suggestion-btn" onclick="fillInput('Quais modalidades terão?')">
+                        Quais modalidades terão?
+                    </button>
+                    <button class="suggestion-btn" onclick="fillInput('Como faço para participar?')">
+                        Como participar?
+                    </button>
+                    <button class="suggestion-btn" onclick="fillInput('Onde será realizado?')">
+                        Onde será realizado?
+                    </button>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Indicador de digitação -->
+        <div class="typing-indicator" id="typingIndicator">
+            Murilão está digitando...
+        </div>
+    </div>
+
+    <!-- Área de Input -->
+    <div class="chat-input-area">
+        <form method="GET" action="{% url 'murilao_ai' %}" class="chat-form" id="chatForm">
+            <textarea 
+                name="q" 
+                class="chat-input" 
+                id="chatInput"
+                placeholder="Digite sua pergunta aqui..." 
+                rows="1"
+                required
+            >{{ query }}</textarea>
+            <button type="submit" class="chat-send-btn" id="sendBtn">
+                ➤
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Elementos DOM
+    const chatMessages = document.getElementById('chatMessages');
+    const chatInput = document.getElementById('chatInput');
+    const chatForm = document.getElementById('chatForm');
+    const sendBtn = document.getElementById('sendBtn');
+    const typingIndicator = document.getElementById('typingIndicator');
+
+    // Auto-scroll para a última mensagem
+    function scrollToBottom() {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    // Scroll automático quando a página carrega
+    window.addEventListener('load', () => {
+        scrollToBottom();
+        chatInput.focus();
+    });
+
+    // Auto-resize do textarea
+    chatInput.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+    });
+
+    // Envio com Enter (Shift+Enter para nova linha)
+    chatInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            if (this.value.trim()) {
+                chatForm.submit();
+            }
+        }
+    });
+
+    // Mostrar indicador de digitação ao enviar
+    chatForm.addEventListener('submit', function() {
+        if (chatInput.value.trim()) {
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = '⏳';
+            typingIndicator.classList.add('show');
+            
+            // Simular delay de resposta (remover em produção)
+            setTimeout(() => {
+                scrollToBottom();
+            }, 100);
+        }
+    });
+
+    // Função para preencher input com sugestões
+    function fillInput(text) {
+        chatInput.value = text;
+        chatInput.focus();
+        chatInput.style.height = 'auto';
+        chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + 'px';
+    }
+
+    // Limpar query do input se estiver vazio
+    window.addEventListener('load', () => {
+        if (chatInput.value.trim() === '') {
+            chatInput.value = '';
+        }
+    });
+
+    // Scroll suave ao carregar nova resposta
+    {% if query and resposta_ia %}
+    window.addEventListener('load', () => {
+        setTimeout(scrollToBottom, 300);
+    });
+    {% endif %} 
+    
+</script>
+
+{% endblock %}
